@@ -54,7 +54,7 @@ CREATE TABLE uoj_lecturer (
 CREATE TABLE uoj_course (
     course_id INT AUTO_INCREMENT PRIMARY KEY,
     course_code VARCHAR(10) UNIQUE,
-    course_name VARCHAR(30)
+    course_name VARCHAR(50)
 );
 CREATE TABLE uoj_class (
     class_id INT AUTO_INCREMENT,
