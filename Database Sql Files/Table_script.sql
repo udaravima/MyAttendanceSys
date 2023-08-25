@@ -2,9 +2,9 @@ USE UoJ;
 CREATE TABLE uoj_user (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
-    user_password VARCHAR(65) NOT NULL,
+    user_password VARCHAR(72) NOT NULL,
     -- 60 Bytes Check!
-    user_salt VARCHAR(25) NOT NULL UNIQUE,
+    user_salt VARCHAR(32) NOT NULL UNIQUE, -- Use bin2hex(random_bytes(16)) each byte represet 2 hex chars
     -- check num of chars use with bin2hex(random_bytes(16))
     user_status TINYINT(1) NOT NULL DEFAULT 2,
     -- 0:Inactive, 1:active, 2:pending
@@ -28,7 +28,7 @@ CREATE TABLE uoj_student (
     std_dob DATE,
     date_admission DATE,
     current_address VARCHAR(50),
-    permanent_address CHAR(50),
+    permanent_address VARCHAR(50),
     mobile_tp_no CHAR(10) UNIQUE,
     home_tp_no CHAR(10),
     std_email VARCHAR(50) UNIQUE,
