@@ -40,6 +40,86 @@ class Lecturer
         }
     }
 
+    public function deleteCourse($courseId)
+    {
+        $query = "DELETE FROM $this->course WHERE course_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param('i', $courseId);
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function deleteClass($classId)
+    {
+        $query = "DELETE FROM $this->class WHERE class_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param('i', $classId);
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function updateCourse($courseId, $courseData)
+    {
+        $query = "UPDATE $this->course SET course_code = ?, course_name = ? WHERE course_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param('ssi', $courseData['course_code'], $courseData['course_name'], $courseId);
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function derollLecturerCourse($lecrId, $courseId)
+    {
+        $query = "DELETE FROM $this->lecrCourse WHERE lecr_id = ? AND course_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param('ii', $lecrId, $courseId);
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function derollStudentCourse($stdId, $courseId)
+    {
+        $query = "DELETE FROM $this->stdCourse WHERE std_id = ? AND course_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param('ii', $stdId, $courseId);
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function getLecturerCourseList($lecrId)
+    {
+        $query = "SELECT * FROM $this->lecrCourse WHERE lecr_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param('i', $lecrId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result;
+    }
+
+    public function getStudentCourseList($stdId)
+    {
+        $query = "SELECT * FROM $this->stdCourse WHERE std_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param('i', $stdId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result;
+    }
+
     public function enrollLectureCourse($lecrId, $courseId)
     {
         $query = "INSERT INTO $this->lecrCourse(lecr_id, course_id) VALUES(?,?)";
@@ -75,5 +155,24 @@ class Lecturer
             return false;
         }
     }
+
+    public function getCourseList($order)
+    {
+        $query = "SELECT * FROM $this->course ";
+        if ($order['search']) {
+            $query .= "WHERE course_code LIKE '%" . $order['search'] . "%' OR course_name LIKE '%" . $order['search'] . "%' ";
+        }
+        if ($order['column']) {
+            $query .= "ORDER BY " . $order['column'] . " " . $order['order'] . " ";
+        }
+        if ($order['length'] != -1) {
+            $query .= "LIMIT " . $order['start'] . ", " . $order['length'];
+        }
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result;
+    }
 }
+
 ?>

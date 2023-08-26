@@ -162,26 +162,49 @@ class User
 
     }
 
-    public function getStudentTable()
+    public function getStudentTable($order)
     {
         $query = "SELECT users.user_id, std.*, users.user_role, users.user_status FROM $this->stdTable as std INNER JOIN $this->userTable as users ON users.user_id = std.user_id ";
+        if ($order['search']) {
+            $query .= "WHERE std.std_fullname LIKE '%" . $order['search'] . "%' OR std.std_regno LIKE '%" . $order['search'] . "%' OR std.std_nic LIKE '%" . $order['search'] . "%' OR std.std_email LIKE '%" . $order['search'] . "%' OR std.std_mobile_tp_no LIKE '%" . $order['search'] . "%' OR std.std_home_tp_no LIKE '%" . $order['search'] . "%' OR std.std_batchno LIKE '%" . $order['search'] . "%' OR std.std_dgree_program LIKE '%" . $order['search'] . "%' OR std.std_subjectcomb LIKE '%" . $order['search'] . "%' OR std.std_current_level LIKE '%" . $order['search'] . "%' OR std.std_dob LIKE '%" . $order['search'] . "%' OR std.std_date_admission LIKE '%" . $order['search'] . "%' OR std.std_current_address LIKE '%" . $order['search'] . "%' OR std.std_permanent_address LIKE '%" . $order['search'] . "%' ";
+        }
+        if (!empty($order['column'])) {
+            $query .= " ORDER BY " . $order['column'] . ' ' . $order['dir'];
+        }
+        if ($order['length'] != -1) {
+            $query .= " LIMIT " . $order['start'] . ', ' . $order['length'];
+        }
         //TODO: Add order by
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $results = $stmt->get_result();
-        while ($user = $results->fetch_assoc()) {
-            // TODO: Something with data!!
-        }
+
+        // while ($user = $results->fetch_assoc()) {
+        //     // TODO: Something with data!!
+        // }
+        return $results;
     }
-    public function getLecturerTable()
+    public function getLecturerTable($order)
     {
+        //TODO: Add order by
         $query = "SELECT users.user_id, lecr.*, users.user_role, users.user_status FROM $this->lecrTable as lecr INNER JOIN $this->userTable as users ON users.user_id = lecr.user_id ";
+        if ($order['search']) {
+            $query .= "WHERE lecr.lecr_name LIKE '%" . $order['search'] . "%' OR lecr.lecr_nic LIKE '%" . $order['search'] . "%' OR lecr.lecr_email LIKE '%" . $order['search'] . "%' OR lecr.lecr_mobile LIKE '%" . $order['search'] . "%' OR lecr.lecr_address LIKE '%" . $order['search'] . "%' ";
+        }
+        if ($order['column']) {
+            $query .= " ORDER BY " . $order['column'] . ' ' . $order['dir'];
+        }
+        if ($order['length'] != -1) {
+            $query .= " LIMIT " . $order['start'] . ', ' . $order['length'];
+        }
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $results = $stmt->get_result();
-        while ($user = $results->fetch_assoc()) {
-            // TODO: Do Something with data!!
-        }
+
+        // while ($user = $results->fetch_assoc()) {
+        //     // TODO: Do Something with data!!
+        // }
+        return $results;
     }
 
     public function registerUser($username, $password, $userRole, $userData)
