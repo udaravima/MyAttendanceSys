@@ -64,6 +64,18 @@ class Lecturer
         }
     }
 
+    public function updateClassInfo($classId, $classData)
+    {
+        $query = "UPDATE $this->class SET class_date = ?, start_time = ?, end_time = ? WHERE class_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param('sssi', $classData['class_date'], $classData['start_time'], $classData['end_time'], $classId);
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function updateCourse($courseId, $courseData)
     {
         $query = "UPDATE $this->course SET course_code = ?, course_name = ? WHERE course_id = ?";
@@ -100,9 +112,12 @@ class Lecturer
         }
     }
 
-    public function getLecturerCourseList($lecrId)
+    public function getLecturerCourseList($lecrId, $order)
     {
         $query = "SELECT * FROM $this->lecrCourse WHERE lecr_id = ?";
+        if ($order['search']) {
+            $query .= " AND course_id LIKE '%" . $order['search'] . "%'";
+        }
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param('i', $lecrId);
         $stmt->execute();
@@ -143,12 +158,24 @@ class Lecturer
             return false;
         }
     }
-
+    // TODO: fix Attendance status
     public function markAttendance($stdId, $classId, $attendTime, $status)
     {
         $query = "INSERT INTO $this->stdClass(std_id, class_id, attend_time, attendance_status) VALUES(?,?,?,?)";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param('iiss', $stdId, $classId, $attendTime, $status);
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function editAttendance($stdId, $ClassId, $attendTime, $status)
+    {
+        $query = "UPDATE $this->stdClass SET attend_time = ?, attendance_status = ? WHERE std_id = ? AND class_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param('ssii', $attendTime, $status, $stdId, $ClassId);
         if ($stmt->execute()) {
             return true;
         } else {
