@@ -3,10 +3,10 @@ ini_set('session.gc_maxlifetime', 1800); //Expire session after 1800s -> 30mins
 session_start();
 class Database
 {
-    private $host = '';
-    private $username = '';
-    private $password = '';
-    private $database = '';
+    private $host = 'localhost';
+    private $username = 'dbadmin';
+    private $password = 'Admin123@';
+    private $database = 'uoj';
 
     public function getConnection()
     {
