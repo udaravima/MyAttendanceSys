@@ -53,7 +53,7 @@ class User
         return $processedName;
     }
 
-    public function login($username, $password)
+    public function login($username, $password, $rememberMe)
     {
         if ($username && $password) {
             //Retrieving User
@@ -69,7 +69,7 @@ class User
                     if ($user['user_status'] == 1) {
                         $_SESSION["user_id"] = $user['user_id'];
                         $_SESSION["user_role"] = $user['user_role'];
-                        // $this->setSessionStatus(true);
+                        $this->setSessionStatus(true);
                         return true;
                     } else {
                         $this->loginMessage = "Account is not Active or Pending Review!";
@@ -87,6 +87,7 @@ class User
                 return false; // Message if username is incorrect!
             }
         } else {
+            $this->loginMessage = "Username or Password Invalid!";
             return false; // Message if username or password is empty!
         }
 
