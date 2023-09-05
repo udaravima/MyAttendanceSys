@@ -38,24 +38,11 @@ class User
         $this->loginMessage = $Message;
     }
 
-    public function processNameInitials($fullName)
-    {
-        // Processing Name with Initial
-        $nameParts = explode(" ", $fullName);
-        $processedName = '';
-        foreach ($nameParts as $index => $namePart) {
-            if ($index === count($nameParts) - 1) {
-                $processedName .= $namePart . ".";
-            } else {
-                $processedName .= substr($namePart, 0, 1) . ". ";
-            }
-        }
-        return $processedName;
-    }
-
+    // TODO: fix remeberme!
     public function login($username, $password, $rememberMe)
     {
-        if ($username && $password) {
+        if (!empty($username) && !empty($password)) {
+            $username = strtolower($username);
             //Retrieving User
             $getUserQuery = "SELECT * FROM " . $this->userTable . " WHERE username = ?";
             $stmt = $this->conn->prepare($getUserQuery);
@@ -65,6 +52,7 @@ class User
             if ($result->num_rows > 0) {
                 $user = $result->fetch_assoc();
                 // if (!($user['user_session'])) {
+                // echo "$username";
                 if (password_verify($password . $user['user_salt'], $user['user_password'])) {
                     if ($user['user_status'] == 1) {
                         $_SESSION["user_id"] = $user['user_id'];
@@ -76,6 +64,7 @@ class User
                         return false; // Message if user has not active or pending
                     }
                 } else {
+                    $this->loginMessage = "Username or Password Invalid!";
                     return false; // Password Incorrect!
                 }
                 // } else {
@@ -94,8 +83,10 @@ class User
     }
     public function setSessionStatus($status)
     {
-        $query = "UPDATE $this->userTable SET user_session = " . (($status) ? 1 : 0) . " WHERE user_id= ?" . $_SESSION['user_id'];
-        if ($this->conn->query($query) === TRUE) {
+        $query = "UPDATE $this->userTable SET user_session = " . (($status) ? 1 : 0) . " WHERE user_id= ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $_SESSION['user_id']);
+        if ($stmt->execute()) {
             return true;
         } else {
             return false;
@@ -119,16 +110,16 @@ class User
     }
     public function isLoggedIn()
     {
-        if (empty($_SESSION["user_id"])) {
-            return false;
-        } else {
+        if (isset($_SESSION["user_id"])) {
             return true;
+        } else {
+            return false;
         }
     }
 
     public function isAdmin()
     {
-        if (!empty($_SESSION["user_role"]) && $_SESSION["user_role"] == 0) {
+        if (isset($_SESSION["user_role"]) && $_SESSION["user_role"] == 0) {
             return true;
         } else {
             return false;
@@ -136,7 +127,7 @@ class User
     }
     public function isLecturer()
     {
-        if (!empty($_SESSION["user_role"]) && $_SESSION["user_role"] == 1) {
+        if (isset($_SESSION["user_role"]) && $_SESSION["user_role"] == 1) {
             return true;
         } else {
             return false;
@@ -144,7 +135,7 @@ class User
     }
     public function isInstructor()
     {
-        if (!empty($_SESSION["user_role"]) && $_SESSION["user_role"] == 2) {
+        if (isset($_SESSION["user_role"]) && $_SESSION["user_role"] == 2) {
             return true;
         } else {
             return false;
@@ -152,7 +143,7 @@ class User
     }
     public function isStudent()
     {
-        if (!empty($_SESSION["user_role"]) && $_SESSION["user_role"] == 3) {
+        if (isset($_SESSION["user_role"]) && $_SESSION["user_role"] == 3) {
             return true;
         } else {
             return false;
@@ -169,25 +160,20 @@ class User
         if ($order['search']) {
             $query .= "WHERE std.std_fullname LIKE '%" . $order['search'] . "%' OR std.std_regno LIKE '%" . $order['search'] . "%' OR std.std_nic LIKE '%" . $order['search'] . "%' OR std.std_email LIKE '%" . $order['search'] . "%' OR std.std_mobile_tp_no LIKE '%" . $order['search'] . "%' OR std.std_home_tp_no LIKE '%" . $order['search'] . "%' OR std.std_batchno LIKE '%" . $order['search'] . "%' OR std.std_dgree_program LIKE '%" . $order['search'] . "%' OR std.std_subjectcomb LIKE '%" . $order['search'] . "%' OR std.std_current_level LIKE '%" . $order['search'] . "%' OR std.std_dob LIKE '%" . $order['search'] . "%' OR std.std_date_admission LIKE '%" . $order['search'] . "%' OR std.std_current_address LIKE '%" . $order['search'] . "%' OR std.std_permanent_address LIKE '%" . $order['search'] . "%' ";
         }
+        //TODO: CHECK
         if (!empty($order['column'])) {
             $query .= " ORDER BY " . $order['column'] . ' ' . $order['dir'];
         }
         if ($order['length'] != -1) {
             $query .= " LIMIT " . $order['start'] . ', ' . $order['length'];
         }
-        //TODO: Add order by
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $results = $stmt->get_result();
-
-        // while ($user = $results->fetch_assoc()) {
-        //     // TODO: Something with data!!
-        // }
         return $results;
     }
     public function getLecturerTable($order)
     {
-        //TODO: Add order by
         $query = "SELECT users.user_id, lecr.*, users.user_role, users.user_status FROM $this->lecrTable as lecr INNER JOIN $this->userTable as users ON users.user_id = lecr.user_id ";
         if ($order['search']) {
             $query .= "WHERE lecr.lecr_name LIKE '%" . $order['search'] . "%' OR lecr.lecr_nic LIKE '%" . $order['search'] . "%' OR lecr.lecr_email LIKE '%" . $order['search'] . "%' OR lecr.lecr_mobile LIKE '%" . $order['search'] . "%' OR lecr.lecr_address LIKE '%" . $order['search'] . "%' ";
@@ -201,33 +187,38 @@ class User
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $results = $stmt->get_result();
-
-        // while ($user = $results->fetch_assoc()) {
-        //     // TODO: Do Something with data!!
-        // }
         return $results;
     }
 
-    public function registerUser($username, $password, $userRole, $userData)
+    public function registerUser($username, $password, $userRole, $userData, $userStatus)
     {
-        $userId = $this->insertUser($username, $password, $userRole);
+        $userRole = intval($userRole);
+        $userStatus = intval($userStatus);
+        $userId = $this->insertUser($username, $password, $userRole, $userStatus);
         if ($userId) {
             if ($userRole == 0 || $userRole == 1 || $userRole == 2) {
-                $this->insertLecturer($userId, $userData);
+                return $this->insertLecturer($userId, $userData);
             } else if ($userRole == 3) {
-                $this->insertStudent($userId, $userData);
+                return $this->insertStudent($userId, $userData);
             }
+        } else {
+            return false;
         }
     }
 
-    public function insertUser($username, $password, $userRole)
+    public function insertUser($username, $password, $userRole, $userStatus)
     {
+        $username = strtolower($username);
         $salt = bin2hex(random_bytes(16));
-        $hashedPassword = password_hash($password . $salt, PASSWORD_BCRYPT);
-        $query = "INSERT INTO $this->userTable(username, user_password, user_salt, user_role) VALUES(?, ?, ?, ?)";
+        $salted = $password . $salt;
+        $hashedPassword = password_hash($salted, PASSWORD_BCRYPT);
+        $query = "INSERT INTO $this->userTable(username, user_password, user_salt, user_role" . (($userStatus) ? ", user_status" : "") . ") VALUES(?, ?, ?, ? " . (($userStatus) ? ", ?" : "") . ")";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam('sssi', $username, $hashedPassword, $salt, $userRole);
-
+        if ($userStatus) {
+            $stmt->bind_param('sssii', $username, $hashedPassword, $salt, $userRole, $userStatus);
+        } else {
+            $stmt->bind_param('sssi', $username, $hashedPassword, $salt, $userRole);
+        }
         if ($stmt->execute()) {
             return $stmt->insert_id;
         } else {
@@ -238,6 +229,8 @@ class User
     //           12->mobile_tp_no, 13->home_tp_no, 14->email, 15->profile_pic, 16-> current_level
     public function insertStudent($userId, $userData)
     {
+        $userData['std_index'] = strtolower($userData['std_index']);
+        $userData['std_gender'] = intval($userData['std_gender']);
         $query = "INSERT INTO $this->stdTable(std_index, std_regno, std_fullname, std_gender, std_batchno, dgree_program, std_subjectcomb, std_nic, std_dob, date_admission, current_address, permanent_address, mobile_tp_no, home_tp_no, std_email, std_profile_pic, current_level, user_id) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param('sssisssssssssssssi', $userData['std_index'], $userData['std_regno'], $userData['std_fullname'], $userData['std_gender'], $userData['std_batchno'], $userData['dgree_program'], $userData['std_subjectcomb'], $userData['std_nic'], $userData['std_dob'], $userData['date_admission'], $userData['current_address'], $userData['permanent_address'], $userData['mobile_tp_no'], $userData['home_tp_no'], $userData['std_email'], $userData['std_profile_pic'], $userData['current_level'], $userId);
@@ -251,6 +244,7 @@ class User
     //UserData: 0->name, 1->mobile, 2->email, 3->gender, 4->address, 5->profile_pic
     public function insertLecturer($userId, $userData)
     {
+        $userData['lecr_gender'] = intval($userData['lecr_gender']);
         $query = "INSERT INTO $this->lecrTable(lecr_nic, lecr_name, lecr_mobile, lecr_email, lecr_gender, lecr_address, lecr_profile_pic, user_id) VALUES(?,?,?,?,?,?,?,?)";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param('ssssissi', $userData['lecr_nic'], $userData['lecr_name'], $userData['lecr_mobile'], $userData['lecr_email'], $userData['lecr_gender'], $userData['lecr_address'], $userData['lecr_profile_pic'], $userId);
@@ -274,9 +268,11 @@ class User
     public function updateUser($userId, $password, $userStatus)
     {
         $query = "UPDATE $this->userTable SET user_status = ?";
+
         if ($password) {
             $query .= ", user_password = ?, user_salt = ?";
         }
+
         $query .= " WHERE user_id = ?";
         $stmt = $this->conn->prepare($query);
         if ($password) {

@@ -9,7 +9,7 @@
 
         if (userType == 3) {
             studentFields.classList.remove("d-none");
-        } else if (userType == 2 || userType == 1) {
+        } else if (userType == 2 || userType == 1 || userType == 0) {
             lecturerFields.classList.remove("d-none");
         }
     }
@@ -56,6 +56,7 @@
         }
     }
 </script>
+
 <!-- Reg User Modal -->
 <div class="modal fade" tabindex="-1" id="reg_user">
     <div class="modal-dialog modal-dialog-scrollable">
@@ -65,7 +66,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="" method="post">
+                <form action="/register_user.php" method="post">
                     <div class="form-group mt-3">
                         <label for="username">Username:</label>
                         <input type="text" class="form-control" id="username" name="username" placeholder="2020csc000"
@@ -87,10 +88,31 @@
                         <label for="user_role">User Role:</label>
                         <select name="user_role" id="user_role" class="form-control" onchange="toggleFields()">
                             <option value='3' selected>Student</option>
-                            <option value='2'>Lecturer</option>
-                            <option value='1'>Instructor</option>
+                            <option value='1'>Lecturer</option>
+                            <option value='2'>Instructor</option>
+                            <?php 
+                            if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 0) {
+                                echo "
+                                <option value='0'>Administrator</option>
+                                ";
+                            }
+                            ?>
                         </select>
                     </div>
+                    <?php
+                    if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 0) {
+                        echo "
+                        <div class='form-group mt-3'>
+                            <label for='user_status'>User Status:</label>
+                            <select name='user_status' id='user_status' class='form-control'>
+                                <option value='2'>Pending</option>
+                                <option value='1'>Active</option>
+                                <option value='0'>InActive</option>
+                            </select>
+                        </div>
+                        ";
+                    }
+                    ?>
                     <!-- std fields -->
                     <div class="d-none" id="std_fields">
                         <!-- <div class="form-floating">
@@ -102,12 +124,12 @@
                         <!-- std_index -->
                         <div class="form-group mt-3">
                             <label for="std_index">Student Index:</label>
-                            <input type="text" class="form-control" id="std_index" name="std_index" required>
+                            <input type="text" class="form-control" id="std_index" name="std_index" >
                         </div>
                         <!-- std_regno -->
                         <div class="form-group mt-3">
                             <label for="std_regno">Student Registration Number:</label>
-                            <input type="text" class="form-control" id="std_regno" name="std_regno" required>
+                            <input type="text" class="form-control" id="std_regno" name="std_regno" >
                         </div>
                         <!-- std_fullname -->
                         <div class="form-group mt-3">
@@ -118,8 +140,8 @@
                         <div class="form-group mt-3">
                             <label for="std_gender">Gender:</label>
                             <select class="form-control" id="std_gender" name="std_gender">
-                                <option value="1">Male</option>
-                                <option value="0">Female</option>
+                                <option value="0">Male</option>
+                                <option value="1">Female</option>
                             </select>
                         </div>
                         <!-- std_batchno -->
@@ -194,7 +216,7 @@
                         <!-- lecr_nic -->
                         <div class="form-group mt-3">
                             <label for="lecr_nic">NIC:</label>
-                            <input type="text" class="form-control" id="lecr_nic" name="lecr_nic" required>
+                            <input type="text" class="form-control" id="lecr_nic" name="lecr_nic" >
                         </div>
                         <!-- lecr_name -->
                         <div class="form-group mt-3">
@@ -204,19 +226,19 @@
                         <!-- lecr_mobile -->
                         <div class="form-group mt-3">
                             <label for="lecr_mobile">Mobile Phone Number:</label>
-                            <input type="tel" class="form-control" id="lecr_mobile" name="lecr_mobile" required>
+                            <input type="tel" class="form-control" id="lecr_mobile" name="lecr_mobile" >
                         </div>
                         <!-- lecr_email -->
                         <div class="form-group mt-3">
                             <label for="lecr_email">Email:</label>
-                            <input type="email" class="form-control" id="lecr_email" name="lecr_email" required>
+                            <input type="email" class="form-control" id="lecr_email" name="lecr_email" >
                         </div>
                         <!-- lecr_gender -->
                         <div class="form-group mt-3">
                             <label for="lecr_gender">Gender:</label>
                             <select class="form-control" id="lecr_gender" name="lecr_gender">
-                                <option value="1">Male</option>
-                                <option value="0">Female</option>
+                                <option value="0">Male</option>
+                                <option value="1">Female</option>
                             </select>
                         </div>
                         <!-- lecr_address -->

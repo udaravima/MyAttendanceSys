@@ -1,5 +1,6 @@
 <?php
 include_once 'php/config/Database.php'; // Carefull with location!
+include_once 'php/class/Utils.php';
 include_once 'php/class/User.php';
 include_once 'php/class/Lecturer.php';
 // include '/php/include/navbar.php';
@@ -8,83 +9,58 @@ $database = new Database();
 $db = $database->getConnection();
 $user = new User($db);
 $lecturer = new Lecturer($db);
-include 'php/include/header.php';
-?>
-
-<title> AMS Login </title>
-
-<?php
-include 'php/include/content.php';
-
+$util = new Utils();
+$_SESSION['root_dir'] = __DIR__;
 if ($user->isLoggedIn()) {
     if ($user->isAdmin()) {
-        header("Location: admin_dashboard.php");
+        header("Location: php/admin_dashboard.php");
     } else if ($user->isLecturer()) {
-        header("Location: lecturer_dashboard.php");
+        header("Location: php/lecturer_dashboard.php");
     } else if ($user->isInstructor()) {
-        header("Location: instructor_dashboard.php");
+        header("Location: php/instructor_dashboard.php");
     } else if ($user->isStudent()) {
-        header("Location: student_dashboard.php");
+        header("Location: php/student_dashboard.php");
     }
 }
-if(isset($_POST['register'])){
-    
-}
+
 if (isset($_POST['sign_in'])) {
 
     $username = (isset($_POST['username'])) ? $_POST['username'] : null;
-    $password = (isset($_POST['password'])) ? $_POST['password'] : null;
+    $password = (isset($_POST['user_password'])) ? $_POST['user_password'] : null;
     $rememberMe = (isset($_POST['rem_me'])) ? $_POST['rem_me'] : null;
 
     if ($user->login($username, $password, $rememberMe)) {
-
         if ($user->isAdmin()) {
-            header("Location: admin_dashboard.php");
+            header("Location: php/admin_dashboard.php");
         } else if ($user->isLecturer()) {
-            header("Location: lecturer_dashboard.php");
+            header("Location: php/lecturer_dashboard.php");
         } else if ($user->isInstructor()) {
-            header("Location: instructor_dashboard.php");
+            header("Location: php/instructor_dashboard.php");
         } else if ($user->isStudent()) {
-            header("Location: student_dashboard.php");
+            header("Location: php/student_dashboard.php");
+        } else {
+            echo "Something Wrong!";
         }
 
     } else {
         // get the message and preview on modal
         $message = $user->getLoginMessage();
         $_POST = array();
-        $logInfoModal = "
-        <div class='modal fade' id='log_info' tabindex='-1' aria-labelledby='login-status' aria-hidden='true'>
-            <div class='modal-dialog modal-dialog'>
-                <div class='modal-content'>
-                    <div class='modal-header'>
-                        <h3>AMS Systems</h3>
-                        <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
-                    </div>
-                    <div class='modal-body'>
-                        <div id='login-alert' class='alert alert-danger'>
-                            <p class=''>$message</p>
-                        </div> 
-                    </div>
-                    <div class='modal-footer'>
-                        <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
-                        <!-- <button type='button' class='btn btn-primary'>Save changes</button> -->
-                    </div>
-                </div>
-            </div>
-        </div>";
+        $_SESSION["error"] = $message;
+        // user message modal
+        $logInfoModal = $util->setMessage($message, 'alert', 'danger');
         echo $logInfoModal;
-        echo "
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    var loginModal = new bootstrap.Modal(document.getElementById('log_info'));
-                    loginModal.show();
-                });
-            </script>";
         // echo '<meta http-equiv="refresh" content= "0">';
     }
 }
 ?>
+<?php
+include 'php/include/header.php';
 
+echo "<title> AMS Login </title>";
+
+include 'php/include/content.php';
+?>
 <!-- content begins  -->
 
 <!-- main container -->
@@ -107,9 +83,9 @@ if (isset($_POST['sign_in'])) {
                 </div>
 
                 <div class="form-floating">
-                    <input type="password" class="form-control" id="password" name="username" placeholder="Password"
-                        required>
-                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="user_password" name="user_password"
+                        placeholder="Password" required>
+                    <label for="user_password">Password</label>
                 </div>
 
                 <div class="form-check text-start my-3">
@@ -142,9 +118,10 @@ if (isset($_POST['sign_in'])) {
 
 <!-- Reg User Module -->
 <?php
-include 'modal_register.php';
+include 'php/modal_register.php';
 ?>
 
+<!-- page scripts -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const logo = document.getElementById('logo');
