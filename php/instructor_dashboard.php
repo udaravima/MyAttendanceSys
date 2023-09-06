@@ -18,7 +18,7 @@ echo "<title>AMS Instructor</title>";
 include 'include/content.php';
 
 $activeDash = 2;
-include 'include/navigation.php';
+include 'include/nav.php';
 
 include 'include/footer.php';
 ?>

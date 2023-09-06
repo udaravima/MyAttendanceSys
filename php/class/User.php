@@ -5,11 +5,8 @@ class User
     private $lecrTable = "uoj_lecturer";
     private $stdTable = "uoj_student";
     private $conn;
-    // private $password;
-    // private $username;
     private $loginMessage;
-
-    private $default_picture = ''; //Set the location of default profile
+    private $default_pro_picture = '/res/profiles/default.png'; //Set the location of default profile
 
 
     public function __construct($db)
@@ -17,16 +14,6 @@ class User
         $this->conn = $db;
         $this->loginMessage = '';
     }
-
-    // public function setPassword($password) //$user->setPassword($_POST[""]);
-    // {
-    //     $this->password = $password;
-    // }
-
-    // public function setUsername($username)
-    // {
-    //     $this->username = $username;
-    // }
 
     public function getLoginMessage()
     {
@@ -36,6 +23,21 @@ class User
     public function setLoginMessage($Message)
     {
         $this->loginMessage = $Message;
+    }
+
+    public function processNameInitials($fullName)
+    {
+        // Processing Name with Initial
+        $nameParts = explode(" ", $fullName);
+        $processedName = '';
+        foreach ($nameParts as $index => $namePart) {
+            if ($index === count($nameParts) - 1) {
+                $processedName .= $namePart . ".";
+            } else {
+                $processedName .= substr($namePart, 0, 1) . ". ";
+            }
+        }
+        return $processedName;
     }
 
     // TODO: fix remeberme!
@@ -57,6 +59,7 @@ class User
                     if ($user['user_status'] == 1) {
                         $_SESSION["user_id"] = $user['user_id'];
                         $_SESSION["user_role"] = $user['user_role'];
+                        $this->setUserBadge();
                         $this->setSessionStatus(true);
                         return true;
                     } else {
@@ -81,6 +84,7 @@ class User
         }
 
     }
+
     public function setSessionStatus($status)
     {
         $query = "UPDATE $this->userTable SET user_session = " . (($status) ? 1 : 0) . " WHERE user_id= ?";
@@ -92,12 +96,23 @@ class User
             return false;
         }
     }
+
     //retrieve for profile or update info
+    public function setUserBadge()
+    {
+        $user = $this->retrieveUserDetails($_SESSION['user_id'], $_SESSION['user_role']);
+        if ($user) {
+            $_SESSION['user_name'] = $this->processNameInitials(isset($user['std_fullname'])) ? $user['std_fullname'] : ((isset($user['lecr_name'])) ? $user['lecr_name'] : '');
+            $picture = (isset($user['std_profile_pic'])) ? $user['std_profile_pic'] : ((isset($user['lecr_profile_pic'])) ? $user['lecr_profile_pic'] : false);
+            $_SESSION['user_profile_pic'] = ($picture) ? $picture : $this->default_pro_picture;
+        }
+    }
+
     public function retrieveUserDetails($userId, $userRole)
     {
         $userTable = $this->userTable;
         $table = ($userRole >= 0 && $userRole < 3) ? $this->lecrTable : $this->stdTable;
-        $query = "SELECT users.user_id, urd.* , users.user_role, users_user_status FROM $table as urd INNER JOIN $userTable as users ON urd.user_id = users.user_id WHERE users.user_id = ?";
+        $query = "SELECT users.user_id, urd.* , users.user_role, users.user_status FROM $table as urd INNER JOIN $userTable as users ON urd.user_id = users.user_id WHERE users.user_id = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param('i', $userId);
         $stmt->execute();
@@ -108,6 +123,35 @@ class User
             return false;
         }
     }
+
+    public function getRoleStr($roleNo)
+    {
+        if ($roleNo == 0) {
+            return 'Administrator';
+        } else if ($roleNo == 1) {
+            return 'Lecturer';
+        } else if ($roleNo == 2) {
+            return 'Instructor';
+        } else if ($roleNo == 3) {
+            return 'Student';
+        } else {
+            return 'Unknown';
+        }
+    }
+
+    public function getStatusStr($statusNo)
+    {
+        if ($statusNo == 2) {
+            return 'Pending';
+        } else if ($statusNo == 1) {
+            return 'Active';
+        } else if ($statusNo == 0) {
+            return 'Inactive';
+        } else {
+            return 'Unknown';
+        }
+    }
+
     public function isLoggedIn()
     {
         if (isset($_SESSION["user_id"])) {
@@ -125,6 +169,7 @@ class User
             return false;
         }
     }
+
     public function isLecturer()
     {
         if (isset($_SESSION["user_role"]) && $_SESSION["user_role"] == 1) {
@@ -133,6 +178,7 @@ class User
             return false;
         }
     }
+
     public function isInstructor()
     {
         if (isset($_SESSION["user_role"]) && $_SESSION["user_role"] == 2) {
@@ -141,6 +187,7 @@ class User
             return false;
         }
     }
+
     public function isStudent()
     {
         if (isset($_SESSION["user_role"]) && $_SESSION["user_role"] == 3) {
@@ -149,45 +196,66 @@ class User
             return false;
         }
     }
+
     public function listStaffUsers()
     {
 
     }
 
+    public function getDefaultProfilePic()
+    {
+        return $this->default_pro_picture;
+
+    }
+
     public function getStudentTable($order)
     {
-        $query = "SELECT users.user_id, std.*, users.user_role, users.user_status FROM $this->stdTable as std INNER JOIN $this->userTable as users ON users.user_id = std.user_id ";
-        if ($order['search']) {
+        $query = "SELECT std.*, users.user_role, users.user_status FROM $this->stdTable as std INNER JOIN $this->userTable as users ON users.user_id = std.user_id ";
+        if (isset($order['search'])) {
             $query .= "WHERE std.std_fullname LIKE '%" . $order['search'] . "%' OR std.std_regno LIKE '%" . $order['search'] . "%' OR std.std_nic LIKE '%" . $order['search'] . "%' OR std.std_email LIKE '%" . $order['search'] . "%' OR std.std_mobile_tp_no LIKE '%" . $order['search'] . "%' OR std.std_home_tp_no LIKE '%" . $order['search'] . "%' OR std.std_batchno LIKE '%" . $order['search'] . "%' OR std.std_dgree_program LIKE '%" . $order['search'] . "%' OR std.std_subjectcomb LIKE '%" . $order['search'] . "%' OR std.std_current_level LIKE '%" . $order['search'] . "%' OR std.std_dob LIKE '%" . $order['search'] . "%' OR std.std_date_admission LIKE '%" . $order['search'] . "%' OR std.std_current_address LIKE '%" . $order['search'] . "%' OR std.std_permanent_address LIKE '%" . $order['search'] . "%' ";
         }
         //TODO: CHECK
-        if (!empty($order['column'])) {
+        if (isset($order['column'])) {
             $query .= " ORDER BY " . $order['column'] . ' ' . $order['dir'];
+        } else {
+            $query .= " ORDER BY std.std_fullname ASC";
         }
-        if ($order['length'] != -1) {
-            $query .= " LIMIT " . $order['start'] . ', ' . $order['length'];
+        if (isset($order['offset']) && $order['offset'] != -1) {
+            $query .= " LIMIT " . $order['limit'] . ' OFFSET ' . $order['offset'];
         }
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $results = $stmt->get_result();
         return $results;
     }
+
     public function getLecturerTable($order)
     {
-        $query = "SELECT users.user_id, lecr.*, users.user_role, users.user_status FROM $this->lecrTable as lecr INNER JOIN $this->userTable as users ON users.user_id = lecr.user_id ";
-        if ($order['search']) {
+        $query = "SELECT lecr.*, users.user_role, users.user_status FROM $this->lecrTable as lecr INNER JOIN $this->userTable as users ON users.user_id = lecr.user_id ";
+        if (isset($order['search'])) {
             $query .= "WHERE lecr.lecr_name LIKE '%" . $order['search'] . "%' OR lecr.lecr_nic LIKE '%" . $order['search'] . "%' OR lecr.lecr_email LIKE '%" . $order['search'] . "%' OR lecr.lecr_mobile LIKE '%" . $order['search'] . "%' OR lecr.lecr_address LIKE '%" . $order['search'] . "%' ";
         }
-        if ($order['column']) {
+        if (isset($order['column'])) {
             $query .= " ORDER BY " . $order['column'] . ' ' . $order['dir'];
+        } else {
+            $query .= " ORDER BY lecr.lecr_name ASC";
         }
-        if ($order['length'] != -1) {
-            $query .= " LIMIT " . $order['start'] . ', ' . $order['length'];
+        if (isset($order['offset']) && $order['offset'] != -1) {
+            $query .= " LIMIT " . $order['limit'] . ' OFFSET ' . $order['offset'];
         }
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $results = $stmt->get_result();
         return $results;
+    }
+
+    public function countRecords($userTable)
+    {
+        $query = "SELECT COUNT(*) as count FROM $userTable";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $results = $stmt->get_result();
+        return $results->fetch_assoc()['count'];
     }
 
     public function registerUser($username, $password, $userRole, $userData, $userStatus)
@@ -211,7 +279,7 @@ class User
         $username = strtolower($username);
         $salt = bin2hex(random_bytes(16));
         $salted = $password . $salt;
-        $hashedPassword = password_hash($salted, PASSWORD_BCRYPT);
+        $hashedPassword = htmlspecialchars(password_hash($salted, PASSWORD_BCRYPT));
         $query = "INSERT INTO $this->userTable(username, user_password, user_salt, user_role" . (($userStatus) ? ", user_status" : "") . ") VALUES(?, ?, ?, ? " . (($userStatus) ? ", ?" : "") . ")";
         $stmt = $this->conn->prepare($query);
         if ($userStatus) {
@@ -225,6 +293,7 @@ class User
             return false;
         }
     }
+
     // UserData: 0->index, 1->regno, 2->fullname, 3->gender, 4->batchno, 5->dgree_program, 6->subjectcomb, 7->nic, 8->dob, 9->admission, 10->current_address, 11->permanent_address
     //           12->mobile_tp_no, 13->home_tp_no, 14->email, 15->profile_pic, 16-> current_level
     public function insertStudent($userId, $userData)
@@ -241,6 +310,7 @@ class User
         }
 
     }
+
     //UserData: 0->name, 1->mobile, 2->email, 3->gender, 4->address, 5->profile_pic
     public function insertLecturer($userId, $userData)
     {
@@ -265,6 +335,7 @@ class User
         }
 
     }
+
     public function updateUser($userId, $password, $userStatus)
     {
         $query = "UPDATE $this->userTable SET user_status = ?";
@@ -289,6 +360,7 @@ class User
             return false;
         }
     }
+
     public function updateLecturer($userId, $userData)
     {
         $query = "UPDATE $this->lecrTable SET lecr_nic = ?, lecr_name = ?, lecr_mobile = ?, lecr_email = ?, lecr_gender = ?, lecr_address = ?, lecr_profile_pic = ? WHERE user_id = ?";
@@ -312,6 +384,7 @@ class User
             return false;
         }
     }
+
     public function delete($userId)
     {
         $userTable = $this->userTable;

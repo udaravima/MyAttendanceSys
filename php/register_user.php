@@ -1,19 +1,28 @@
 <?php
-include_once 'php/config/Database.php';
-include_once 'php/class/User.php';
-include_once 'php/class/Utils.php';
+include_once 'config/Database.php';
+include_once 'class/User.php';
+include_once 'class/Utils.php';
 
 $database = new Database();
 $db = $database->getConnection();
 $user = new User($db);
 $util = new Utils();
 
-include 'php/include/header.php';
+include 'include/header.php';
 echo "<title>AMS Registration</title>";
-include 'php/include/content.php';
+include 'include/content.php';
 
 //if just directly importing ignore above until php
+function storeProfilePic($targetDir, $fileId, $nic)
+{
+    $targetLocation = $targetDir . (($nic) ? $nic . "_" : "") . basename($_FILES[$fileId]["name"]);
 
+    if (move_uploaded_file($_FILES[$fileId]["tmp_name"], $targetLocation)) {
+        return $targetLocation;
+    } else {
+        return false;
+    }
+}
 if (isset($_POST['register'])) {
     //to Store userData
     $userData = array();
@@ -53,14 +62,16 @@ if (isset($_POST['register'])) {
         if (isset($_POST['lecr_gender'])) {
             $userData['lecr_gender'] = intval($_POST['lecr_gender']);
         }
-        if (isset($_FILES["lecr_profile_pic"]) && $_FILES["lecr_profile_pic"]["error"] == 0) {
+        if (isset($_FILES["lecr_profile_pic"])) {
             //TODO: get and upload photo
-            $picLocation = $util->storeProfilePic('res/profiles/lecturer/', 'lecr_profile_pic', (isset($_POST['lecr_nic'])) ? $userData['lecr_nic'] : null);
-            if ($picLocation) {
+            $picLocation = $util->storeProfilePic('../res/profiles/lecturer/', 'lecr_profile_pic', (isset($_POST['lecr_nic'])) ? $userData['lecr_nic'] : '');
+            echo $picLocation . "<br>";
+            if ($picLocation != null && $picLocation) {
                 $userData['lecr_profile_pic'] = $picLocation;
+                echo $userData['lecr_profile_pic'];
             } else {
-                $userData['lecr_profile_pic'] = 'res/profiles/lecturer/default.png';
-                $util->setMessage("Error Uploading Profile Picture", 'alert', 'alert-danger');
+                $userData['lecr_profile_pic'] = '/res/profiles/lecturer/default.png';
+                echo $util->setMessage("Error Uploading Profile Picture", 'alert', 'alert-danger');
             }
         }
         // To Student data --> userData
@@ -118,18 +129,19 @@ if (isset($_POST['register'])) {
         }
         if (isset($_FILES["std_profile_pic"]) && $_FILES["std_profile_pic"]["error"] == 0) {
             //TODO: get and upload photo
-            $picLocation = $util->storeProfilePic('res/profiles/student/', 'std_profile_pic', (isset($_POST['std_nic'])) ? $userData['std_nic'] : null);
-            if ($picLocation) {
+            $picLocation = $util->storeProfilePic('../res/profiles/student/', 'std_profile_pic', (isset($_POST['std_nic'])) ? $userData['std_nic'] : null);
+            if ($picLocation != null && $picLocation) {
                 $userData['std_profile_pic'] = $picLocation;
+
             } else {
-                $userData['std_profile_pic'] = 'res/profiles/lecturer/default.png';
-                $util->setMessage("Error Uploading Profile Picture", 'alert', 'alert-danger');
+                $userData['std_profile_pic'] = '/res/profiles/lecturer/default.png';
+                echo $util->setMessage("Error Uploading Profile Picture", 'alert', 'alert-danger');
             }
         }
     }
     // Registration
     if ($user->registerUser($username, $password, $user_role, $userData, $user_status)) {
-        $util->setMessage("User Registration successfull", 'alert', 'success');
+        echo $util->setMessage("User Registration successfull", 'alert', 'success');
         // if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 0) {
         //     // header("Location: /php/admin_dashboard.php");
         //     echo "<script>window.location.href = '/php/admin_dashboard.php';</script>";
@@ -137,11 +149,10 @@ if (isset($_POST['register'])) {
         // } else {
         //     // header("Location: index.php");
         //     echo "<script>window.location.href = '/index.php';</script>";
-
         // }
 
     } else {
-        $util->setMessage("User Registration Failed", 'alert', 'danger');
+        echo $util->setMessage("User Registration Failed", 'alert', 'danger');
         // if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 0) {
         //     // header("Location: admin_dashboard.php");
         //     echo "<script>window.location.href = '/php/admin_dashboard.php';</script>";
@@ -158,5 +169,5 @@ if (isset($_POST['register'])) {
 //     // header("Location: index.php");
 //     echo "<script>window.location.href = '/index.php';</script>";
 // }
-include 'php/include/footer.php';
+include 'include/footer.php';
 ?>

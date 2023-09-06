@@ -66,7 +66,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="/register_user.php" method="post">
+                <form action="/php/register_user.php" method="post">
                     <div class="form-group mt-3">
                         <label for="username">Username:</label>
                         <input type="text" class="form-control" id="username" name="username" placeholder="2020csc000"
@@ -90,7 +90,7 @@
                             <option value='3' selected>Student</option>
                             <option value='1'>Lecturer</option>
                             <option value='2'>Instructor</option>
-                            <?php 
+                            <?php
                             if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 0) {
                                 echo "
                                 <option value='0'>Administrator</option>
@@ -124,12 +124,12 @@
                         <!-- std_index -->
                         <div class="form-group mt-3">
                             <label for="std_index">Student Index:</label>
-                            <input type="text" class="form-control" id="std_index" name="std_index" >
+                            <input type="text" class="form-control" id="std_index" name="std_index">
                         </div>
                         <!-- std_regno -->
                         <div class="form-group mt-3">
                             <label for="std_regno">Student Registration Number:</label>
-                            <input type="text" class="form-control" id="std_regno" name="std_regno" >
+                            <input type="text" class="form-control" id="std_regno" name="std_regno">
                         </div>
                         <!-- std_fullname -->
                         <div class="form-group mt-3">
@@ -216,7 +216,7 @@
                         <!-- lecr_nic -->
                         <div class="form-group mt-3">
                             <label for="lecr_nic">NIC:</label>
-                            <input type="text" class="form-control" id="lecr_nic" name="lecr_nic" >
+                            <input type="text" class="form-control" id="lecr_nic" name="lecr_nic">
                         </div>
                         <!-- lecr_name -->
                         <div class="form-group mt-3">
@@ -226,12 +226,12 @@
                         <!-- lecr_mobile -->
                         <div class="form-group mt-3">
                             <label for="lecr_mobile">Mobile Phone Number:</label>
-                            <input type="tel" class="form-control" id="lecr_mobile" name="lecr_mobile" >
+                            <input type="tel" class="form-control" id="lecr_mobile" name="lecr_mobile">
                         </div>
                         <!-- lecr_email -->
                         <div class="form-group mt-3">
                             <label for="lecr_email">Email:</label>
-                            <input type="email" class="form-control" id="lecr_email" name="lecr_email" >
+                            <input type="email" class="form-control" id="lecr_email" name="lecr_email">
                         </div>
                         <!-- lecr_gender -->
                         <div class="form-group mt-3">

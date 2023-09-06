@@ -17,7 +17,7 @@ include 'include/header.php';
 echo "<title>AMS Student</title>";
 include 'include/content.php';
 $activeDash = 3;
-include 'include/navigation.php';
+include 'include/nav.php';
 
 include 'include/footer.php';
 ?>
