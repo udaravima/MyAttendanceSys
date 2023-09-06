@@ -1,8 +1,8 @@
-<nav class="navbar navbar-expand-sm fixed-top navbar-light mt-0 mb-5">
+<nav class="navbar navbar-expand-sm fixed-top navbar-light mt-0 mb-5 bg-primary">
     <div class="container">
 
         <a class="navbar-brand" href="/index.php">
-            <img id="logo" src="/res/logo/AMS_logo.png" alt="AMS_logo" width="40" height="40"
+            <img id="logo" src="2020/2020g3/res/logo/AMS_logo.png" alt="AMS_logo" width="40" height="40"
                 class="d-inline-block align-text-top">
             AMS
         </a>
@@ -18,27 +18,27 @@
                 if ($_SESSION['user_role'] == 0) {
                     echo "
                 <li class='nav-item'>
-                    <a class='nav-link " . (($activeDash == 0) ? "active" : "") . "' href='/php/admin_dashboard.php'>Admin</a>
+                    <a class='nav-link " . (($activeDash == 0) ? "active" : "") . "' href='2020/2020g3/php/admin_dashboard.php'>Admin</a>
                 </li>";
                 }
 
                 if ($_SESSION['user_role'] < 2) {
                     echo "
                 <li class='nav-item'>
-                    <a class='nav-link " . (($activeDash == 1) ? "active" : "") . "' href='/php/lecturer_dashboard.php'>Lecturer</a>
+                    <a class='nav-link " . (($activeDash == 1) ? "active" : "") . "' href='2020/2020g3/php/lecturer_dashboard.php'>Lecturer</a>
                 </li>";
                 }
 
                 if ($_SESSION['user_role'] < 3) {
                     echo "
                 <li class='nav-item'>
-                    <a class='nav-link " . (($activeDash == 2) ? "active" : "") . "' href='/php/Instructor_dashboard.php'>Instructor</a>
+                    <a class='nav-link " . (($activeDash == 2) ? "active" : "") . "' href='2020/2020g3/php/Instructor_dashboard.php'>Instructor</a>
                 </li>";
                 }
                 ?>
                 <li class='nav-item'>
                     <a class='nav-link <?php echo ($activeDash == 3) ? "active" : ""; ?>'
-                        href='/php/student_dashboard.php'>Student</a>
+                        href='2020/2020g3/php/student_dashboard.php'>Student</a>
                 </li>
             </ul>
             <hr>
@@ -58,7 +58,7 @@
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item" href="/php/logout.php">Sign out</a></li>
+                    <li><a class="dropdown-item" href="2020/2020g3/php/logout.php">Sign out</a></li>
                 </ul>
             </div>
         </div>
@@ -81,10 +81,9 @@
         function updateImage(theme) {
             // Define a mapping of themes to image URLs
             const logoImages = {
-                dark: "/res/logo/AMS_logo_w.png",
-                light: "/res/logo/AMS_logo.png",
+                dark: "2020/2020g3/res/logo/AMS_logo_w.png",
+                light: "2020/2020g3/res/logo/AMS_logo.png",
             };
-
             // Set the image source based on the selected theme
             logo.src = logoImages[theme];
         }

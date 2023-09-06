@@ -1,5 +1,5 @@
 <?php
-$password = "admin123@";
+$password = "user123@";
 $salt = bin2hex(random_bytes(16));
 $hash = password_hash($password . $salt, PASSWORD_BCRYPT);
 echo $hash . "<br>";

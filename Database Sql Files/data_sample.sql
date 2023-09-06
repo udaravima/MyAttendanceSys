@@ -1,5 +1,5 @@
 -- Insert test data into uoj_user table
-
+use 2020g3;
 INSERT INTO
     uoj_user (
         username,
