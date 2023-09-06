@@ -1,8 +1,8 @@
 <nav class="navbar navbar-expand-sm fixed-top navbar-light mt-0 mb-5 bg-primary">
     <div class="container">
 
-        <a class="navbar-brand" href="/index.php">
-            <img id="logo" src="2020/2020g3/res/logo/AMS_logo.png" alt="AMS_logo" width="40" height="40"
+        <a class="navbar-brand" href="/2020/2020g3/index.php">
+            <img id="logo" src="/2020/2020g3/res/logo/AMS_logo.png" alt="AMS_logo" width="40" height="40"
                 class="d-inline-block align-text-top">
             AMS
         </a>
@@ -38,7 +38,7 @@
                 ?>
                 <li class='nav-item'>
                     <a class='nav-link <?php echo ($activeDash == 3) ? "active" : ""; ?>'
-                        href='2020/2020g3/php/student_dashboard.php'>Student</a>
+                        href='/2020/2020g3/php/student_dashboard.php'>Student</a>
                 </li>
             </ul>
             <hr>
@@ -58,7 +58,7 @@
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item" href="2020/2020g3/php/logout.php">Sign out</a></li>
+                    <li><a class="dropdown-item" href="/2020/2020g3/php/logout.php">Sign out</a></li>
                 </ul>
             </div>
         </div>

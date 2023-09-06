@@ -6,7 +6,7 @@ class User
     private $stdTable = "uoj_student";
     private $conn;
     private $loginMessage;
-    private $default_pro_picture = '/res/profiles/default.png'; //Set the location of default profile
+    private $default_pro_picture = '/2020/2020g3/res/profiles/default.png'; //Set the location of default profile
 
 
     public function __construct($db)

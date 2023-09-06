@@ -64,7 +64,7 @@ if (isset($_POST['register'])) {
         }
         if (isset($_FILES["lecr_profile_pic"])) {
             //TODO: get and upload photo
-            $picLocation = $util->storeProfilePic('../2020/2020g3/res/profiles/lecturer/', 'lecr_profile_pic', (isset($_POST['lecr_nic'])) ? $userData['lecr_nic'] : '');
+            $picLocation = $util->storeProfilePic('/2020/2020g3/res/profiles/lecturer/', 'lecr_profile_pic', (isset($_POST['lecr_nic'])) ? $userData['lecr_nic'] : '');
             echo $picLocation . "<br>";
             if ($picLocation != null && $picLocation) {
                 $userData['lecr_profile_pic'] = $picLocation;
@@ -129,7 +129,7 @@ if (isset($_POST['register'])) {
         }
         if (isset($_FILES["std_profile_pic"]) && $_FILES["std_profile_pic"]["error"] == 0) {
             //TODO: get and upload photo
-            $picLocation = $util->storeProfilePic('../2020/2020g3/res/profiles/student/', 'std_profile_pic', (isset($_POST['std_nic'])) ? $userData['std_nic'] : null);
+            $picLocation = $util->storeProfilePic('/2020/2020g3/res/profiles/student/', 'std_profile_pic', (isset($_POST['std_nic'])) ? $userData['std_nic'] : null);
             if ($picLocation != null && $picLocation) {
                 $userData['std_profile_pic'] = $picLocation;
 
@@ -142,32 +142,32 @@ if (isset($_POST['register'])) {
     // Registration
     if ($user->registerUser($username, $password, $user_role, $userData, $user_status)) {
         echo $util->setMessage("User Registration successfull", 'alert', 'success');
-        // if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 0) {
-        //     // header("Location: /2020/2020g3/php/admin_dashboard.php");
-        //     echo "<script>window.location.href = '/2020/2020g3/php/admin_dashboard.php';</script>";
+        if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 0) {
+            // header("Location: /2020/2020g3/php/admin_dashboard.php");
+            echo "<script>window.location.href = '/2020/2020g3/php/admin_dashboard.php';</script>";
 
-        // } else {
-        //     // header("Location: index.php");
-        //     echo "<script>window.location.href = '/index.php';</script>";
-        // }
+        } else {
+            // header("Location: index.php");
+            echo "<script>window.location.href = '/2020/2020g3/index.php';</script>";
+        }
 
     } else {
         echo $util->setMessage("User Registration Failed", 'alert', 'danger');
-        // if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 0) {
-        //     // header("Location: admin_dashboard.php");
-        //     echo "<script>window.location.href = '/2020/2020g3/php/admin_dashboard.php';</script>";
-        // } else {
-        //     echo "<script>window.location.href = '/index.php';</script>";
-        //     // header("Location: index.php");
-        // }
+        if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 0) {
+            // header("Location: admin_dashboard.php");
+            echo "<script>window.location.href = '/2020/2020g3/php/admin_dashboard.php';</script>";
+        } else {
+            echo "<script>window.location.href = '/2020/2020g3/index.php';</script>";
+            // header("Location: index.php");
+        }
     }
 }
-// if (!empty($_SESSION['user_role']) && $_SESSION['user_role'] == 0) {
-//     echo "<script>window.location.href = '/2020/2020g3/php/admin_dashboard.php';</script>";
+if (!empty($_SESSION['user_role']) && $_SESSION['user_role'] == 0) {
+    echo "<script>window.location.href = '/2020/2020g3/php/admin_dashboard.php';</script>";
 
-// } else {
-//     // header("Location: index.php");
-//     echo "<script>window.location.href = '/index.php';</script>";
-// }
+} else {
+    // header("Location: index.php");
+    echo "<script>window.location.href = '/2020/2020g3/index.php';</script>";
+}
 include 'include/footer.php';
 ?>

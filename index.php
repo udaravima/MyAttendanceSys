@@ -138,8 +138,8 @@ include 'php/modal_register.php';
         function updateImage(theme) {
             // Define a mapping of themes to image URLs
             const logoImages = {
-                dark: "/res/logo/AMS_side_banner_w.png",
-                light: "/res/logo/AMS_side_banner.png",
+                dark: "/2020/2020g3/res/logo/AMS_side_banner_w.png",
+                light: "/2020/2020g3/res/logo/AMS_side_banner.png",
             };
 
             // Set the image source based on the selected theme
