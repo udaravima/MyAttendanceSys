@@ -8,8 +8,8 @@ $user = new User($conn);
 
 session_start();
 $user->setSessionStatus(false);
-header("Location: /index.php");
+header("Location: 2020/2020g3/index.php");
 $_SESSION['user_id'] = '';
 session_destroy();
-header("Location: /index.php");
+header("Location: 2020/2020g3/index.php");
 ?>

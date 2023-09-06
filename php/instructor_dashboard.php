@@ -8,7 +8,7 @@ $conn = $db->getConnection();
 $user = new User($conn);
 
 if (!($user->isLoggedIn()) || $_SESSION['user_role'] > 2) {
-    header("Location: /index.php");
+    header("Location: 2020/2020g3/index.php");
 }
 
 ?>

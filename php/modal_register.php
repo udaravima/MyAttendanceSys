@@ -66,7 +66,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="/php/register_user.php" method="post">
+                <form action="/2020/2020g3/php/register_user.php" method="post">
                     <div class="form-group mt-3">
                         <label for="username">Username:</label>
                         <input type="text" class="form-control" id="username" name="username" placeholder="2020csc000"

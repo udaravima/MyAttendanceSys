@@ -10,7 +10,7 @@ $user = new User($conn);
 $lecr = new Lecturer($conn);
 
 if (!($user->isLoggedIn()) || $_SESSION['user_role'] > 1) {
-    header("Location: /index.php");
+    header("Location: 2020/2020g3/index.php");
 }
 
 ?>
