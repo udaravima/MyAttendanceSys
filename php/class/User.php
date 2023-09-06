@@ -102,7 +102,7 @@ class User
     {
         $user = $this->retrieveUserDetails($_SESSION['user_id'], $_SESSION['user_role']);
         if ($user) {
-            $_SESSION['user_name'] = $this->processNameInitials(isset($user['std_fullname'])) ? $user['std_fullname'] : ((isset($user['lecr_name'])) ? $user['lecr_name'] : '');
+            $_SESSION['user_name'] = $this->processNameInitials(($_SESSION['user_role'] == 3) ? $user['std_fullname'] : $user['lecr_name']);
             $picture = (isset($user['std_profile_pic'])) ? $user['std_profile_pic'] : ((isset($user['lecr_profile_pic'])) ? $user['lecr_profile_pic'] : false);
             $_SESSION['user_profile_pic'] = ($picture) ? $picture : $this->default_pro_picture;
         }

@@ -22,9 +22,10 @@ $activeDash = 0;
 include 'include/nav.php';
 ?>
 
-
-<div class="container mt-5" id="lecr_data">
-    <?php
+<!-- Lecture Table  -->
+<div class="container-sm mt-5" id="lecr_data">
+    <h1>Lecture Records</h1>
+    <button type="button" class="btn btn-success my-3 float-end ms-auto" data-bs-toggle="modal" data-bs-target="#reg_user">+Add User</button> <?php
     $order = array();
     $itemsPerPage = 10;
     $currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
@@ -32,9 +33,8 @@ include 'include/nav.php';
     $order['limit'] = $itemsPerPage;
     $totalCount = $user->countRecords('uoj_lecturer');
     $totalPages = ceil($totalCount / $itemsPerPage);
-    ?>
-    <table class="table table-striped table-hover border shadow" id="lecture_data">
-        <h1>Lecture Records</h1>
+    ?> <table
+        class="table table-striped table-hover border shadow" id="lecture_data">
         <thead>
             <tr>
                 <th>#</th>
@@ -44,6 +44,7 @@ include 'include/nav.php';
                 <th>Role</th>
                 <th>Status</th>
                 <th>Photo</th>
+                <th class="visually-hidden">userID</th>
             </tr>
         </thead>
         <tbody>
@@ -66,19 +67,20 @@ include 'include/nav.php';
             }
             ?>
         </tbody>
-    </table>
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                <li class="page-item <?php echo ($i == $currentPage) ? 'active' : ''; ?>">
-                    <a class="page-link" href="admin_dashboard.php?page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                </li>
-            <?php endfor; ?>
-        </ul>
-    </nav>
+        </table>
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <li class="page-item <?php echo ($i == $currentPage) ? 'active' : ''; ?>">
+                        <a class="page-link" href="admin_dashboard.php?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                    </li>
+                <?php endfor; ?>
+            </ul>
+        </nav>
 </div>
 
-<div class="container mt-5" id="std_data">
+<!-- Student Table -->
+<div class="container-sm mt-5" id="std_data">
     <?php
     $order = array();
     $itemsPerPage = 10;
@@ -88,7 +90,7 @@ include 'include/nav.php';
     $totalCount = $user->countRecords('uoj_student');
     $totalPages = ceil($totalCount / $itemsPerPage);
     ?>
-    <table class="table table-striped" id="student_data">
+    <table class="table table-striped table-hover border shadow" id="student_data">
         <h1>Student Records</h1>
         <thead>
             <tr>
@@ -130,7 +132,52 @@ include 'include/nav.php';
     </nav>
 </div>
 
+<!-- Get Courses -->
+<div class="container-sm mt-5" id="course_data">
+    <?php
+    $order = array();
+    $itemsPerPage = 10;
+    $currentPage = isset($_GET['pageC']) ? $_GET['pageC'] : 1;
+    $order['offset'] = ($currentPage - 1) * $itemsPerPage;
+    $order['limit'] = $itemsPerPage;
+    $totalCount = $user->countRecords('uoj_course');
+    $totalPages = ceil($totalCount / $itemsPerPage);
+    ?>
+    <table class="table table-striped table-hover border shadow" id="courses_data">
+        <h1>Student Records</h1>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Course Code</th>
+                <th>Course Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            $courses = $lecr->getCourseList($order);
+            $i = 1;
+            while ($course = $courses->fetch_assoc()) {
+                echo "<tr>";
+                echo "<td>" . $i++ . "</td>";
+                echo "<td>" . $course['course_code'] . "</td>";
+                echo "<td>" . $course['course_name'] . "</td>";
+                echo "</tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                <li class="page-item <?php echo ($i == $currentPage) ? 'active' : ''; ?>">
+                    <a class="page-link" href="admin_dashboard.php?pageC=<?php echo $i; ?>"><?php echo $i; ?></a>
+                </li>
+            <?php endfor; ?>
+        </ul>
+    </nav>
+</div>
 
 <?php
+include 'modal_register.php';
 include 'include/footer.php';
 ?>

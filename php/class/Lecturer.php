@@ -186,14 +186,14 @@ class Lecturer
     public function getCourseList($order)
     {
         $query = "SELECT * FROM $this->course ";
-        if ($order['search']) {
+        if (isset($order['search'])) {
             $query .= "WHERE course_code LIKE '%" . $order['search'] . "%' OR course_name LIKE '%" . $order['search'] . "%' ";
         }
-        if ($order['column']) {
+        if (isset($order['column'])) {
             $query .= "ORDER BY " . $order['column'] . " " . $order['order'] . " ";
         }
-        if ($order['length'] != -1) {
-            $query .= "LIMIT " . $order['start'] . ", " . $order['length'];
+        if ($order['offset'] != -1) {
+            $query .= "LIMIT " . $order['limit'] . " OFFSET " . $order['offset'];
         }
         $stmt = $this->conn->prepare($query);
         $stmt->execute();

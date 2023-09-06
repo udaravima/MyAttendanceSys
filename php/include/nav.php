@@ -42,10 +42,10 @@
                 </li>
             </ul>
             <hr>
-            <div class="dropdown justify-content-lg-end">
+            <div class="dropdown ms-auto">
                 <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle"
                     data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="<?php echo $_SESSION['user_profile_pic'] ?>" alt="" width="32" height="32"
+                    <img src="<?php echo $_SESSION['user_profile_pic'] ?>" alt="" width="64" height="64 "
                         class="rounded-circle me-2">
                     <strong>
                         <?php echo $_SESSION['user_name']; ?>
