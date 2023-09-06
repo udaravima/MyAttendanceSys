@@ -4,9 +4,9 @@ session_start();
 class Database
 {
     private $host = 'localhost';
-    private $username = 'dbadmin';
-    private $password = 'Admin123@';
-    private $database = 'uoj';
+    private $username = '2020g3';
+    private $password = '!2qwasZX';
+    private $database = '2020g3';
 
     public function getConnection()
     {
